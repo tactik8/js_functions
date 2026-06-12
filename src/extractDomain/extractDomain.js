@@ -1,4 +1,4 @@
-const extractDomain = (url) => {
+export const extractDomain = (url) => {
   if (typeof url !== 'string' || url.trim().length === 0) {
     throw new TypeError('Input must be a non-empty string');
   }
