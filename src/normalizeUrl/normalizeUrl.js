@@ -1,4 +1,4 @@
-const normalizeUrl = (inputUrl) => {
+export const normalizeUrl = (inputUrl) => {
   if (typeof inputUrl !== 'string') {
     throw new TypeError('Input must be a string');
   }
