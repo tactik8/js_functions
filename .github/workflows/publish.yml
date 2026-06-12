@@ -19,6 +19,9 @@ jobs:
         with:
           node-version: '20'
           registry-url: 'https://npm.pkg.github.com'
+      
+      - name: Install webpack
+        run: npm install -D webpack-cli
 
       - name: Install Dependencies2
         run: npm install --yes
