@@ -1,4 +1,4 @@
-const ensureArray = (value) => {
+export const ensureArray = (value) => {
   if (Array.isArray(value)) {
     return value;
   }
