@@ -1,0 +1,23 @@
+{
+    "name": "extractEmails",
+    "status": "completed",
+    "questions": [],
+    "requirements": [
+        "Identify and extract all email addresses from a provided string",
+        "Return an array of unique email addresses",
+        "Convert all extracted emails to lowercase for consistency",
+        "Validate that the input is a string",
+        "Handle multiple occurrences and various TLD lengths"
+    ],
+    "edge_cases": [
+        "Input is null, undefined, or not a string",
+        "String contains no emails (should return empty array)",
+        "Duplicate emails in the same string",
+        "Emails with special characters like '+' or '.' in the local part",
+        "Emails followed immediately by punctuation (e.g., 'contact@test.com.')",
+        "Subdomains and long TLDs"
+    ],
+    "src": "export const extractEmails = (text) => {\n  if (typeof text !== 'string') {\n    throw new TypeError('Input must be a string');\n  }\n\n  const emailRegex = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/gi;\n  const matches = text.match(emailRegex);\n\n  if (!matches) return [];\n\n  const uniqueEmails = [...new Set(matches.map(email => email.toLowerCase()))];\n  return uniqueEmails;\n};",
+    "example": "const text = 'Contact us at support@example.com or sales.dept@company.co.uk. For billing, use support@example.com.';\nconst emails = extractEmails(text);\nconsole.log(emails); // ['support@example.com', 'sales.dept@company.co.uk']",
+    "tests": "const assert = require('assert');\n\n// Test 1: Standard extraction\nconst res1 = extractEmails('Hello test@me.com');\nassert.deepStrictEqual(res1, ['test@me.com']);\n\n// Test 2: Multiple and duplicates\nconst res2 = extractEmails('Contact a@b.com and A@B.COM');\nassert.deepStrictEqual(res2, ['a@b.com']);\n\n// Test 3: Complex addresses\nconst res3 = extractEmails('My email is john.doe+filter@sub.domain.org!');\nassert.deepStrictEqual(res3, ['john.doe+filter@sub.domain.org']);\n\n// Test 4: Empty/No results\nassert.deepStrictEqual(extractEmails('No emails here'), []);\n\n// Test 5: Error handling\nassert.throws(() => extractEmails(null), /Input must be a string/);"
+}
