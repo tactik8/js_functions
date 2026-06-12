@@ -32,9 +32,18 @@ jobs:
       - name: Run Build Script
         run: npm run build
 
-      - name: Store Build Result
-        uses: actions/upload-artifact@v4
-        with:
-          name: production-build       # The name of your zip file
-          path: dist/                  # The folder you want to save
-          retention-days: 300    
+      - name: Commit and Push Build Results
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@://github.com"
+          
+          # Stage the dist folder changes
+          git add dist/
+          
+          # Check if there are actually changes to commit (prevents empty commit failures)
+          if git diff --cached --quiet; then
+            echo "No changes detected in build output. Skipping commit."
+          else
+            git commit -m "chore: automated build update [skip ci]"
+            git push
+          fi
