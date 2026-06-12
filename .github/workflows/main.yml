@@ -36,16 +36,16 @@ jobs:
         run: |
           # Set up git identity using the official GitHub actions bot profile
           git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@://github.com"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           
-          # Force add dist directory in case it's still cached in global gitignores
-          git add -F dist/ || git add dist/
+          # Force add dist directory (corrected flag to lowercase -f)
+          git add -f dist/
           
           # Check if the build generated any file changes compared to what is currently on GitHub
           if git diff --cached --quiet; then
             echo "No changes detected in build output. Skipping repository update."
           else
-            # The [skip ci] tag is mandatory to prevent an infinite automated build loop
+            # Fixes detached HEAD by explicitly pushing the local HEAD to the remote main branch
             git commit -m "chore: automated build update [skip ci]"
-            git push origin main
+            git push origin HEAD:main
           fi
