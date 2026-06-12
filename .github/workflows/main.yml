@@ -32,7 +32,9 @@ jobs:
       - name: Run Build Script
         run: npm run build
 
-      - name: Publish to GitHub Packages
-        run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Automatically provided by GitHub
+      - name: Store Build Result
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-build       # The name of your zip file
+          path: dist/                  # The folder you want to save
+          retention-days: 300    
