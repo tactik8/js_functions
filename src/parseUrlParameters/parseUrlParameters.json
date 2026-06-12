@@ -1,0 +1,25 @@
+{
+    "name": "parseUrlParameters",
+    "status": "completed",
+    "questions": [],
+    "requirements": [
+        "Input must be a valid string",
+        "Extract all query parameters from the URL string",
+        "Return an object where keys are parameter names and values are parameter values",
+        "Support multiple values for the same key by returning an array",
+        "Automatically decode URI-encoded characters",
+        "Handle URLs with hash fragments correctly by ignoring everything after '#'"
+    ],
+    "edge_cases": [
+        "Input is null or undefined",
+        "Input is not a string",
+        "URL has no query string (no '?')",
+        "URL contains keys without values",
+        "URL contains duplicate keys",
+        "URL contains special characters or encoded spaces",
+        "Input is only a query string without a base URL"
+    ],
+    "src": "export const parseUrlParameters = (urlString) => {\n  if (typeof urlString !== 'string') {\n    throw new TypeError('Input must be a string');\n  }\n\n  const queryString = urlString.includes('?') \n    ? urlString.split('?')[1].split('#')[0] \n    : (urlString.includes('=') && !urlString.includes('/') ? urlString : '');\n\n  const params = new URLSearchParams(queryString);\n  const result = {};\n\n  for (const [key, value] of params.entries()) {\n    if (Object.prototype.hasOwnProperty.call(result, key)) {\n      if (Array.isArray(result[key])) {\n        result[key].push(value);\n      } else {\n        result[key] = [result[key], value];\n      }\n    } else {\n      result[key] = value;\n    }\n  }\n\n  return result;\n};",
+    "example": "const params = parseUrlParameters('https://example.com/api?user=dev&id=123&tag=js&tag=node#section1');\nconsole.log(params); // { user: 'dev', id: '123', tag: ['js', 'node'] }",
+    "tests": "const runTests = () => {\n  const assert = (condition, message) => {\n    if (!condition) throw new Error(message);\n  };\n\n  // Test basic parsing\n  const t1 = parseUrlParameters('http://test.com?a=1&b=2');\n  assert(t1.a === '1' && t1.b === '2', 'Basic parsing failed');\n\n  // Test duplicate keys (arrays)\n  const t2 = parseUrlParameters('?item=apple&item=orange');\n  assert(Array.isArray(t2.item) && t2.item[0] === 'apple', 'Duplicate key handling failed');\n\n  // Test URI decoding\n  const t3 = parseUrlParameters('?name=John%20Doe');\n  assert(t3.name === 'John Doe', 'URI decoding failed');\n\n  // Test no parameters\n  const t4 = parseUrlParameters('https://example.com/path');\n  assert(Object.keys(t4).length === 0, 'Should return empty object for no params');\n\n  // Test hash exclusion\n  const t5 = parseUrlParameters('?page=1#footer');\n  assert(t5.page === '1' && !t5.footer, 'Hash fragment should be ignored');\n\n  console.log('All tests passed');\n};\nrunTests();"
+}
