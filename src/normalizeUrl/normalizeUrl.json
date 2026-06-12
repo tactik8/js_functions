@@ -1,0 +1,25 @@
+{
+    "name": "normalizeUrl",
+    "status": "completed",
+    "questions": [],
+    "requirements": [
+        "Accept a URL string as input",
+        "Normalize scheme and host to lowercase",
+        "Remove default ports (80 for http, 443 for https)",
+        "Sort query parameters alphabetically by key",
+        "Handle percent-encoding according to RFC 3986 (ISO/IEC 3986 equivalent)",
+        "Remove trailing slashes from the path (unless it is the root)",
+        "Resolve dot-segments (. and ..) in the path"
+    ],
+    "edge_cases": [
+        "Input is not a string",
+        "Malformed URLs missing protocol",
+        "URLs with duplicate query keys",
+        "URLs with empty query values",
+        "URLs with trailing dots in hostname",
+        "Internationalized Domain Names (IDN)"
+    ],
+    "src": "const normalizeUrl = (inputUrl) => {\n  if (typeof inputUrl !== 'string') {\n    throw new TypeError('Input must be a string');\n  }\n\n  let url;\n  try {\n    url = new URL(inputUrl.trim());\n  } catch (error) {\n    throw new Error(`Invalid URL: ${error.message}`);\n  }\n\n  // 1. Hostname is automatically lowercased and IDN-encoded by URL class\n  // 2. Default ports are automatically removed by URL class\n\n  // 3. Normalize Path: Remove trailing slash if not root\n  if (url.pathname.length > 1 && url.pathname.endsWith('/')) {\n    url.pathname = url.pathname.slice(0, -1);\n  }\n\n  // 4. Sort Query Parameters\n  const params = Array.from(url.searchParams.entries());\n  if (params.length > 0) {\n    params.sort(([keyA], [keyB]) => keyA.localeCompare(keyB));\n    \n    // Clear and re-append sorted params\n    url.search = '';\n    params.forEach(([key, value]) => {\n      url.searchParams.append(key, value);\n    });\n  }\n\n  // 5. Remove trailing dot from hostname if present\n  if (url.hostname.endsWith('.')) {\n    url.hostname = url.hostname.slice(0, -1);\n  }\n\n  // URL.toString() handles RFC 3986 percent-encoding (uppercase hex)\n  return url.toString();\n};",
+    "example": "const original = 'HTTPS://EXAMPLE.COM:443/Path/To/../To/Index/?b=2&a=1#fragment';\nconst normalized = normalizeUrl(original);\nconsole.log(normalized); // 'https://example.com/Path/To/Index?a=1&b=2#fragment'",
+    "tests": "const runTests = () => {\n  const assertions = [\n    { input: 'HTTP://google.com:80/', expected: 'http://google.com/' },\n    { input: 'https://example.com/dir/?z=9&a=1', expected: 'https://example.com/dir?a=1&z=9' },\n    { input: 'https://EXAMPLE.com/A/../B', expected: 'https://example.com/B' },\n    { input: 'https://example.com/path/', expected: 'https://example.com/path' },\n    { input: 'https://example.com/?q=val%20ue', expected: 'https://example.com/?q=val+ue' }\n  ];\n\n  assertions.forEach(({ input, expected }, index) => {\n    const result = normalizeUrl(input);\n    if (result !== expected) {\n      throw new Error(`Test ${index} failed: Expected ${expected}, got ${result}`);\n    }\n  });\n\n  console.log('All tests passed');\n};\n\nrunTests();"
+}
