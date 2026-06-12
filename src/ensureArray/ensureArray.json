@@ -1,0 +1,20 @@
+{
+    "name": "ensureArray",
+    "status": "completed",
+    "questions": [],
+    "requirements": [
+        "Check if the input value is already an instance of an Array.",
+        "Return the original array if the input is already an array (avoiding nested wrapping).",
+        "Wrap non-array values (numbers, strings, objects) into a new array containing that single element.",
+        "Handle null and undefined by returning an empty array to ensure downstream iteration safety."
+    ],
+    "edge_cases": [
+        "Input is null or undefined (returns empty array instead of wrapping null/undefined).",
+        "Input is a string (returns array with the whole string, does not split into characters).",
+        "Input is an object or function (returns array containing the object/function).",
+        "Input is already a populated or empty array (returns as-is)."
+    ],
+    "src": "const ensureArray = (value) => {\n  if (Array.isArray(value)) {\n    return value;\n  }\n  if (value === null || value === undefined) {\n    return [];\n  }\n  return [value];\n};",
+    "example": "const items = ensureArray('single-item'); // ['single-item']\nconst list = ensureArray([1, 2, 3]); // [1, 2, 3]\nconst empty = ensureArray(null); // []",
+    "tests": "const runTests = () => {\n  const tests = [\n    { input: [1, 2], expected: [1, 2], label: 'Already an array' },\n    { input: 'hello', expected: ['hello'], label: 'String input' },\n    { input: 42, expected: [42], label: 'Number input' },\n    { input: null, expected: [], label: 'Null input' },\n    { input: undefined, expected: [], label: 'Undefined input' },\n    { input: { a: 1 }, expected: [{ a: 1 }], label: 'Object input' }\n  ];\n\n  tests.forEach(({ input, expected, label }) => {\n    const result = ensureArray(input);\n    const passed = JSON.stringify(result) === JSON.stringify(expected);\n    console.log(`[${passed ? 'PASS' : 'FAIL'}] ${label}:`, { input, result });\n    if (!passed) throw new Error(`Test failed for ${label}`);\n  });\n};\n\nrunTests();"
+}
