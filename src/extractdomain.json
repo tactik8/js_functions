@@ -1,0 +1,23 @@
+{
+    "name": "extractDomain",
+    "status": "completed",
+    "questions": [],
+    "requirements": [
+        "Accept a URL string as input",
+        "Return the domain (hostname) part of the URL",
+        "Handle URLs with and without protocols (http, https, etc.)",
+        "Strip paths, query parameters, and fragments",
+        "Validate input to ensure it is a non-empty string"
+    ],
+    "edge_cases": [
+        "Input missing protocol (e.g., 'google.com')",
+        "Input with port numbers (e.g., 'localhost:8080')",
+        "Input with credentials (e.g., 'user:pass@example.com')",
+        "Non-string or empty string inputs",
+        "Internationalized Domain Names (IDN)",
+        "Malformed URL strings"
+    ],
+    "src": "const extractDomain = (url) => {\n  if (typeof url !== 'string' || url.trim().length === 0) {\n    throw new Error('Invalid input: URL must be a non-empty string');\n  }\n\n  let cleanedUrl = url.trim();\n\n  // Check if the URL has a protocol; if not, prepend 'http://' to allow URL parsing\n  const protocolRegex = /^[a-z]+:\\/\\//i;\n  if (!protocolRegex.test(cleanedUrl)) {\n    cleanedUrl = `http://${cleanedUrl}`;\n  }\n\n  try {\n    const urlObject = new URL(cleanedUrl);\n    return urlObject.hostname;\n  } catch (err) {\n    throw new Error('Invalid URL: Could not extract domain');\n  }\n};",
+    "example": "try {\n  const domain = extractDomain('https://sub.example.com/path?query=1');\n  console.log(domain); // Output: 'sub.example.com'\n} catch (err) {\n  console.error(err.message);\n}",
+    "tests": "const assert = require('assert');\n\n// Test cases\ntry {\n  assert.strictEqual(extractDomain('https://www.google.com/search'), 'www.google.com');\n  assert.strictEqual(extractDomain('http://localhost:3000/api'), 'localhost');\n  assert.strictEqual(extractDomain('google.com'), 'google.com');\n  assert.strictEqual(extractDomain('user:pass@example.io/path'), 'example.io');\n  assert.strictEqual(extractDomain('ftp://files.server.net'), 'files.server.net');\n  \n  // Test for invalid inputs\n  assert.throws(() => extractDomain(''), /Invalid input/);\n  assert.throws(() => extractDomain(null), /Invalid input/);\n  assert.throws(() => extractDomain('!!!'), /Invalid URL/);\n\n  console.log('All tests passed successfully.');\n} catch (error) {\n  console.error('Test failed:', error.message);\n}"
+}
