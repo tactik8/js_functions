@@ -1,0 +1,21 @@
+{
+    "name": "appendQueryParams",
+    "status": "completed",
+    "questions": [],
+    "requirements": [
+        "Accept a base URL string and a parameters object",
+        "Preserve existing query parameters in the URL",
+        "Properly URL-encode keys and values",
+        "Support array values as repeated keys in the query string",
+        "Filter out null or undefined values from the object"
+    ],
+    "edge_cases": [
+        "Base URL already has a query string",
+        "Parameters object is empty, null, or undefined",
+        "Values contain special characters (spaces, &, =)",
+        "Invalid URL string provided"
+    ],
+    "src": "export const appendQueryParams = (url, params) => {\n  if (typeof url !== 'string') {\n    throw new TypeError('The URL must be a string');\n  }\n\n  if (!params || typeof params !== 'object' || Array.isArray(params)) {\n    return url;\n  }\n\n  try {\n    const urlObj = new URL(url);\n\n    Object.entries(params).forEach(([key, value]) => {\n      if (value === null || value === undefined) return;\n\n      if (Array.isArray(value)) {\n        value.forEach((val) => urlObj.searchParams.append(key, val));\n      } else {\n        urlObj.searchParams.append(key, value);\n      }\n    });\n\n    return urlObj.toString();\n  } catch (error) {\n    throw new Error(`Invalid URL: ${url}`);\n  }\n};",
+    "example": "const url = 'https://example.com/search?category=books';\nconst params = {\n  q: 'node.js',\n  page: 1,\n  tags: ['coding', 'javascript'],\n  empty: null\n};\n\nconst result = appendQueryParams(url, params);\n// Result: 'https://example.com/search?category=books&q=node.js&page=1&tags=coding&tags=javascript'",
+    "tests": "const assert = require('assert');\n\ntry {\n  // Test: Basic functionality\n  const t1 = appendQueryParams('https://test.com', { a: 1 });\n  assert.strictEqual(t1, 'https://test.com/?a=1');\n\n  // Test: Existing parameters\n  const t2 = appendQueryParams('https://test.com?existing=true', { new: 'yes' });\n  assert.strictEqual(t2, 'https://test.com/?existing=true&new=yes');\n\n  // Test: Arrays\n  const t3 = appendQueryParams('https://test.com', { list: [1, 2] });\n  assert.strictEqual(t3, 'https://test.com/?list=1&list=2');\n\n  // Test: Special characters\n  const t4 = appendQueryParams('https://test.com', { query: 'hello world' });\n  assert.strictEqual(t4, 'https://test.com/?query=hello+world');\n\n  // Test: Null/Undefined handling\n  const t5 = appendQueryParams('https://test.com', { val: null, other: undefined, keep: 0 });\n  assert.strictEqual(t5, 'https://test.com/?keep=0');\n\n  console.log('All tests passed!');\n} catch (e) {\n  console.error('Test failed:', e.message);\n}"
+}
