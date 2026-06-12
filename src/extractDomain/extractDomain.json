@@ -1,0 +1,22 @@
+{
+    "name": "extractDomain",
+    "status": "completed",
+    "questions": [],
+    "requirements": [
+        "Input must be a string containing a URL or hostname.",
+        "Extract the hostname from the URL, ignoring path, query parameters, and fragments.",
+        "Normalize URLs by prepending a protocol if missing to ensure proper parsing.",
+        "Strip the 'www.' prefix from the resulting domain for a cleaner identifier.",
+        "Throw informative errors for invalid inputs or non-string types."
+    ],
+    "edge_cases": [
+        "URL without a protocol (e.g., 'example.com/path')",
+        "URL with port numbers (e.g., 'localhost:8080')",
+        "IP addresses as hostnames",
+        "Malformed URLs or empty strings",
+        "Subdomains (e.g., 'api.example.com' should return 'api.example.com' unless explicitly stripping subdomains is requested; standard practice returns the full hostname minus www)"
+    ],
+    "src": "const extractDomain = (url) => {\n  if (typeof url !== 'string' || url.trim().length === 0) {\n    throw new TypeError('Input must be a non-empty string');\n  }\n\n  let input = url.trim();\n\n  if (!/^https?:\\/\\//i.test(input) && !/^\\/\\//.test(input)) {\n    input = 'http://' + input;\n  }\n\n  try {\n    const urlObj = new URL(input);\n    let hostname = urlObj.hostname;\n\n    if (hostname.startsWith('www.')) {\n      hostname = hostname.slice(4);\n    }\n\n    return hostname;\n  } catch (err) {\n    throw new Error(`Failed to extract domain: ${err.message}`);\n  }\n};",
+    "example": "try {\n  const domain = extractDomain('https://www.github.com/nodejs/node');\n  console.log(domain); // Output: 'github.com'\n} catch (e) {\n  console.error(e.message);\n}",
+    "tests": "const assert = require('assert');\n\n// Test standard URL\nassert.strictEqual(extractDomain('https://www.google.com'), 'google.com');\n\n// Test URL without protocol\nassert.strictEqual(extractDomain('example.com/test'), 'example.com');\n\n// Test subdomain\nassert.strictEqual(extractDomain('api.v1.example.co.uk'), 'api.v1.example.co.uk');\n\n// Test IP address\nassert.strictEqual(extractDomain('http://127.0.0.1:3000'), '127.0.0.1');\n\n// Test invalid input\nassert.throws(() => extractDomain(''), /Input must be a non-empty string/);\nassert.throws(() => extractDomain(null), /Input must be a non-empty string/);"
+}
