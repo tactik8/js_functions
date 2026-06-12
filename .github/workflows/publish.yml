@@ -20,6 +20,9 @@ jobs:
           node-version: '20'
           registry-url: 'https://npm.pkg.github.com'
 
+      - name: Install Dependencies2
+        run: npm install --yes
+        
       - name: Install Dependencies
         run: npm ci --yes
 
